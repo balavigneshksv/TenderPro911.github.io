@@ -1545,8 +1545,32 @@ tr:hover td{background:rgba(201,169,110,.03)}
       </div>
       <div class="qp-footer">
         <div class="qgrand-row"><div><div class="qgrand-lbl">Estimated Total</div><div class="qsqft" id="qSqft">0 sq ft</div></div><div class="qgrand-val" id="qGrand">₹0</div></div>
-        <div class="qnote">* Approx. Final quote after site visit. Installation & taxes extra.</div>
-        <button class="qbtn" onclick="saveAndPrint()">💾 Save Quote to Dashboard</button>
+        <div class="qnote">* Approx. Final quote after site visit. Installation & taxes extra. GST extra.</div>
+        <!-- Admin Quote Mode Panel — hidden from customers, shown only to admin -->
+        <div id="adminQuotePanel" style="display:none">
+          <div style="background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.2);padding:12px 14px;margin-bottom:8px">
+            <div style="font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">⚡ Admin Quote Mode</div>
+            <input id="adminCustName" type="text" placeholder="Customer Name *" style="width:100%;background:var(--card2);border:1px solid rgba(201,169,110,.3);color:var(--warm-white);padding:9px 12px;font-size:12px;font-family:'DM Sans',sans-serif;margin-bottom:6px;box-sizing:border-box">
+            <input id="adminCustPhone" type="text" placeholder="Phone Number" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--warm-white);padding:9px 12px;font-size:12px;font-family:'DM Sans',sans-serif;margin-bottom:6px;box-sizing:border-box">
+            <input id="adminCustCity" type="text" placeholder="City" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--warm-white);padding:9px 12px;font-size:12px;font-family:'DM Sans',sans-serif;margin-bottom:8px;box-sizing:border-box">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <div style="flex:1">
+                <div style="font-size:9px;letter-spacing:.2em;color:var(--warm-grey);margin-bottom:4px;text-transform:uppercase">Markup %</div>
+                <input id="adminMarkup" type="number" placeholder="e.g. 20" min="0" max="200" style="width:100%;background:var(--card2);border:1px solid rgba(201,169,110,.3);color:var(--gold);padding:9px 12px;font-size:16px;font-family:'Bebas Neue',sans-serif;box-sizing:border-box" oninput="recalc()">
+              </div>
+              <div style="font-size:11px;color:var(--warm-grey);margin-top:16px">% added on<br>all units</div>
+            </div>
+            <div style="font-size:9px;letter-spacing:.2em;color:var(--warm-grey);margin-bottom:6px;text-transform:uppercase">Custom Line Items</div>
+            <div id="customLinesList"></div>
+            <div style="display:grid;grid-template-columns:1fr 90px 34px;gap:5px;margin-top:5px">
+              <input id="customItemName" type="text" placeholder="Item name" style="background:var(--card2);border:1px solid var(--border);color:var(--warm-white);padding:8px 10px;font-size:12px;font-family:'DM Sans',sans-serif">
+              <input id="customItemPrice" type="number" placeholder="₹" style="background:var(--card2);border:1px solid var(--border);color:var(--warm-white);padding:8px 8px;font-size:12px;font-family:'DM Sans',sans-serif">
+              <button onclick="addCustomLine()" style="background:rgba(201,169,110,.1);border:1px solid rgba(201,169,110,.2);color:var(--gold);cursor:pointer;font-size:20px;font-family:'DM Sans',sans-serif">+</button>
+            </div>
+          </div>
+          <button class="qbtn" id="saveAdminQuoteBtn" onclick="saveAdminQuote()" style="background:rgba(201,169,110,.15);margin-bottom:6px">💾 Save Admin Quote</button>
+        </div>
+        <button class="qbtn" id="saveQuoteBtn" onclick="saveAndPrint()">💾 Save Quote to Dashboard</button>
         <button class="qwa" onclick="sendWA()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Send on WhatsApp
@@ -1726,6 +1750,8 @@ function goPg(p,addHistory=true){
   window.scrollTo(0,0);
   document.getElementById('nav').style.display=(p==='home')?'flex':'none';
   if(p==='dash')renderDash();
+  if(p==='portfolio')loadPortfolioIfNeeded();
+  if(p==='calc')checkAdminQuotePanel();
   if(addHistory && window.history){
     window.history.pushState({page:p},'',window.location.pathname+'#'+p);
   }
@@ -2364,9 +2390,16 @@ function updBadge(r){
   const b=document.getElementById('b-'+r);if(b)b.textContent=n;
   const t=document.querySelector(`[data-r="${r}"]`);if(t)t.classList.toggle('has',n>0);
 }
+function getMarkup(){
+  const el=document.getElementById('adminMarkup');
+  if(!el||!isAdminSession())return 1;
+  const v=parseFloat(el.value);
+  return isNaN(v)||v<=0?1:(1+v/100);
+}
+
 function recalc(){
   let grand=0,tsqft=0;const bd={};
-  // Get all active rooms including dynamic bedrooms
+  const markup=getMarkup();
   const activeRooms=Array.from(document.querySelectorAll('.rtab[data-r]')).map(t=>t.dataset.r);
   activeRooms.forEach(r=>{
     if(!dims[r])return;
@@ -2374,10 +2407,19 @@ function recalc(){
     let rt=0;const items=[];
     rd.u.forEach(u=>{
       const dv=dims[r][u.id];
-      if(dv&&dv.on&&dv.sqft>0){const sqft=dv.sqft,price=Math.round(sqft*getRate(r,u.r)),rate=getRate(r,u.r);rt+=price;tsqft+=sqft;items.push({n:u.n,l:dv.l,h:dv.h,sqft,price,rate});}
+      if(dv&&dv.on&&dv.sqft>0){
+        const sqft=dv.sqft;
+        const basePrice=Math.round(sqft*getRate(r,u.r));
+        const price=Math.round(basePrice*markup);
+        const rate=getRate(r,u.r);
+        rt+=price;tsqft+=sqft;
+        items.push({n:u.n,l:dv.l,h:dv.h,sqft,price,rate});
+      }
     });
     if(items.length){const rdd=getRoomDef(r);bd[r]={l:getBedLabel(r),i:rdd.i,m:{...rMats[r]},tot:rt,items};grand+=rt;}
   });
+  // Add custom line items
+  if(typeof customLineItems!=='undefined') grand+=customLineItems.reduce((s,i)=>s+i.price,0);
   document.getElementById('calcTotal').textContent='₹'+grand.toLocaleString('en-IN');
   document.getElementById('qGrand').textContent='₹'+grand.toLocaleString('en-IN');
   document.getElementById('qSqft').textContent=tsqft.toFixed(1)+' sq ft total';
@@ -2385,14 +2427,19 @@ function recalc(){
 }
 function buildQP(bd){
   const empty=document.getElementById('qEmpty'),rooms=document.getElementById('qRooms');
-  if(!Object.keys(bd).length){empty.style.display='block';rooms.innerHTML='';return;}
+  const hasCustom=typeof customLineItems!=='undefined'&&customLineItems.length>0;
+  if(!Object.keys(bd).length&&!hasCustom){empty.style.display='block';rooms.innerHTML='';return;}
   empty.style.display='none';
-  rooms.innerHTML=Object.entries(bd).map(([r,d])=>`
+  let html=Object.entries(bd).map(([r,d])=>`
   <div class="qroom">
     <div class="qroom-hdr"><span class="qroom-name">${d.i} ${d.l}</span><span class="qroom-tot">₹${d.tot.toLocaleString('en-IN')}</span></div>
     <div class="qroom-mats"><span class="qmat">${d.m.core}</span><span class="qmat">${d.m.finish}</span><span class="qmat">${d.m.hw}</span></div>
-    ${d.items.map(it=>`<div class="qitem"><div><div class="qitem-name">${it.n}</div><div class="qitem-detail">${it.sqft.toFixed(1)} sqft @ ₹${it.rate}/sqft</div></div><div class="qitem-price">₹${it.price.toLocaleString('en-IN')}</div></div>`).join('')}
+    ${d.items.map(it=>`<div class="qitem"><div><div class="qitem-name">${it.n}</div><div class="qitem-detail">${it.sqft.toFixed(1)} sq ft</div></div><div class="qitem-price">₹${it.price.toLocaleString('en-IN')}</div></div>`).join('')}
   </div>`).join('');
+  if(hasCustom){
+    html+=`<div class="qroom"><div class="qroom-hdr"><span class="qroom-name">📦 Additional Items</span><span class="qroom-tot">₹${customLineItems.reduce((s,i)=>s+i.price,0).toLocaleString('en-IN')}</span></div>${customLineItems.map(it=>`<div class="qitem"><div><div class="qitem-name">${it.name}</div></div><div class="qitem-price">₹${it.price.toLocaleString('en-IN')}</div></div>`).join('')}</div>`;
+  }
+  rooms.innerHTML=html;
 }
 function resetAll(){
   Object.keys(dims).forEach(r=>{dims[r]={};updBadge(r);});
@@ -2525,7 +2572,7 @@ function sendWA(){
     'ESTIMATED TOTAL : Rs.' + grand.toLocaleString('en-IN') + '\n' +
     line + '\n\n' +
     'Note: Final quote after site visit.' + '\n' +
-    'Transportation, Design and Taxes extra. Kitchen accessories not included.' + '\n\n' +
+    'GST will be extra. Transportation & Design extra. Kitchen accessories not included.' + '\n\n' +
     'elevateinteriors.org';
   window.open('https://wa.me/'+ADMIN_WA+'?text='+encodeURIComponent(msg),'_blank');
 }
@@ -2577,6 +2624,7 @@ function adminLogin(){
   if(pw===ADMIN_PASSWORD){
     document.getElementById('admin-login-screen').style.display='none';
     document.getElementById('admin-dashboard').style.display='block';
+    sessionStorage.setItem('elevate_admin','1');
     loadAdminData();
   }else{
     msg.style.display='block';
@@ -2589,15 +2637,96 @@ function adminLogout(){
   document.getElementById('admin-login-screen').style.display='flex';
   document.getElementById('admin-dashboard').style.display='none';
   document.getElementById('admin-pw').value='';
+  sessionStorage.removeItem('elevate_admin');
   goPg('home');
+}
+
+function isAdminSession(){
+  return sessionStorage.getItem('elevate_admin')==='1';
 }
 
 function switchAdminTab(tab, el){
   document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('on'));
   el.classList.add('on');
-  ['users','quotes','bookings'].forEach(s=>{
+  ['users','quotes','bookings','portfolio'].forEach(s=>{
     document.getElementById('admin-section-'+s).style.display = s===tab?'block':'none';
   });
+  if(tab==='portfolio') loadAdminPortfolio();
+}
+
+async function loadAdminPortfolio(){
+  const el = document.getElementById('adminPortfolioList');
+  el.innerHTML = '<div style="text-align:center;color:var(--warm-grey);padding:40px">Loading...</div>';
+  try {
+    const res = await fetch(API + '/portfolios');
+    const data = await res.json();
+    const projects = Array.isArray(data) ? data : (data.portfolios || []);
+    if(projects.length===0){
+      el.innerHTML='<div style="text-align:center;color:var(--warm-grey);padding:40px">No projects yet. Add your first project above.</div>';
+      return;
+    }
+    const catLabels={kitchen:'Kitchen',bedroom:'Bedroom',living:'Living Room',fullhome:'Full Home',other:'Other'};
+    el.innerHTML = projects.map(p=>`
+      <div style="display:grid;grid-template-columns:80px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--border)">
+        <img src="${p.images&&p.images[0]?p.images[0]:''}" style="width:80px;height:60px;object-fit:cover;border-radius:2px;background:var(--card2)" onerror="this.style.display='none'">
+        <div>
+          <div style="font-weight:500;color:var(--warm-white);margin-bottom:3px">${p.name||p.title||'Untitled'}</div>
+          <div style="font-size:12px;color:var(--gold);margin-bottom:3px">${catLabels[p.category]||p.category||''}</div>
+          <div style="font-size:11px;color:var(--warm-grey)">${p.location||''} ${p.description?'· '+p.description:''}</div>
+          <div style="font-size:10px;color:var(--warm-grey);margin-top:3px">${(p.images||[]).length} image(s)</div>
+        </div>
+        <button onclick="adminDeletePortfolio('${p._id}')" style="background:rgba(229,115,115,.1);border:1px solid rgba(229,115,115,.3);color:#E57373;padding:8px 14px;cursor:pointer;font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:.1em">Delete</button>
+      </div>
+    `).join('');
+  } catch(e) {
+    el.innerHTML='<div style="text-align:center;color:#E57373;padding:40px">Error loading projects.</div>';
+  }
+}
+
+async function adminAddPortfolio(){
+  const name=document.getElementById('pf-name').value.trim();
+  const cat=document.getElementById('pf-cat').value;
+  const loc=document.getElementById('pf-loc').value.trim();
+  const desc=document.getElementById('pf-desc').value.trim();
+  const imgsRaw=document.getElementById('pf-imgs').value.trim();
+  const msg=document.getElementById('pf-msg');
+  if(!name){msg.style.color='#E57373';msg.textContent='Project name is required';return;}
+  if(!imgsRaw){msg.style.color='#E57373';msg.textContent='At least one image URL is required';return;}
+  const images=imgsRaw.split('\n').map(s=>s.trim()).filter(Boolean);
+  msg.style.color='var(--gold)';msg.textContent='Adding...';
+  try {
+    const res=await fetch(API+'/portfolios',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-admin-secret':ADMIN_SECRET},
+      body:JSON.stringify({name,category:cat,location:loc,description:desc,images})
+    });
+    const data=await res.json();
+    if(res.ok){
+      msg.style.color='#4CAF50';msg.textContent='✓ Project added!';
+      document.getElementById('pf-name').value='';
+      document.getElementById('pf-loc').value='';
+      document.getElementById('pf-desc').value='';
+      document.getElementById('pf-imgs').value='';
+      loadAdminPortfolio();
+      LB_PROJECTS=[];// Force reload on next portfolio visit
+    } else {
+      msg.style.color='#E57373';msg.textContent=data.message||'Error adding project';
+    }
+  } catch(e){
+    msg.style.color='#E57373';msg.textContent='Network error. Try again.';
+  }
+}
+
+async function adminDeletePortfolio(id){
+  if(!confirm('Delete this project? This cannot be undone.'))return;
+  try {
+    const res=await fetch(API+'/portfolios/'+id,{
+      method:'DELETE',
+      headers:{'x-admin-secret':ADMIN_SECRET}
+    });
+    if(res.ok){loadAdminPortfolio();LB_PROJECTS=[];}
+    else alert('Could not delete. Try again.');
+  } catch(e){alert('Network error.');}
 }
 
 async function adminApiCall(endpoint){
@@ -2903,7 +3032,7 @@ function adminDownloadPDF(q){
 }
 
 
-// Secret admin access: type #admin in URL hash or press Ctrl+Shift+A
+// Secret admin access: Ctrl+Shift+A, #admin hash, or triple-click logo
 window.addEventListener('hashchange', () => {
   if (window.location.hash === '#admin') {
     goPg('admin');
@@ -2913,6 +3042,20 @@ window.addEventListener('hashchange', () => {
 document.addEventListener('keydown', e => {
   if (e.ctrlKey && e.shiftKey && e.key === 'A') {
     goPg('admin');
+  }
+});
+
+// Triple-click logo to open admin (click 3 times within 600ms)
+let _logoClicks = 0, _logoTimer = null;
+document.addEventListener('click', e => {
+  if (e.target.closest('.nav-brand') || e.target.closest('.nav-logo')) {
+    _logoClicks++;
+    if (_logoTimer) clearTimeout(_logoTimer);
+    _logoTimer = setTimeout(() => { _logoClicks = 0; }, 800);
+    if (_logoClicks >= 3) {
+      _logoClicks = 0;
+      goPg('admin');
+    }
   }
 });
 
@@ -3151,7 +3294,7 @@ function sendQuoteWA(q){
     'ESTIMATED TOTAL : Rs.' + Number(q.total).toLocaleString('en-IN') + '\n' +
     line + '\n\n' +
     'Note: Final quote after site visit.' + '\n' +
-    'Transportation, Design and Taxes extra. Kitchen accessories not included.' + '\n\n' +
+    'GST will be extra. Transportation & Design extra. Kitchen accessories not included.' + '\n\n' +
     'elevateinteriors.org';
   window.open('https://wa.me/'+ADMIN_WA+'?text='+encodeURIComponent(msg),'_blank');
 }
@@ -3250,31 +3393,74 @@ function editQuote(q){
 }
 
 // ═══ PORTFOLIO ═══
-// ┌─────────────────────────────────────────────────────────────┐
-// │  PORTFOLIO EDITOR — Edit your projects here easily!         │
-// │  Each project: {img, title, detail, cat, location}          │
-// │  cat options: "kitchen" | "bedroom" | "living" |            │
-// │               "fullhome" | "other"                          │
-// └─────────────────────────────────────────────────────────────┘
-const LB_PROJECTS = [
-  {img:"https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=90&auto=format&fit=crop",title:"Sharma Residence Kitchen",detail:"RS Puram, Coimbatore · BWP Plywood · PU Finish · Hettich"},
-  {img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&q=90&auto=format&fit=crop",title:"Nair Family Kitchen",detail:"Peelamedu, Coimbatore · BWP Plywood · Acrylic · Haffle"},
-  {img:"https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=1200&q=90&auto=format&fit=crop",title:"Krishnamurthy Straight Kitchen",detail:"Saibaba Colony, Coimbatore · MR Plywood · Glossy Mica · Ebco"},
-  {img:"https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=90&auto=format&fit=crop",title:"Master Bedroom - Patel Villa",detail:"Avinashi Road, Coimbatore · BWP Plywood · PU Finish · Hettich"},
-  {img:"https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1200&q=90&auto=format&fit=crop",title:"Children Bedroom - Iyer Home",detail:"Gandhipuram, Coimbatore · MR Plywood · Mica · Ebco"},
-  {img:"https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=90&auto=format&fit=crop",title:"Living Room - Mehta Residence",detail:"Race Course, Coimbatore · HDHMR · Acrylic · Haffle"},
-  {img:"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=1200&q=90&auto=format&fit=crop",title:"Feature Wall - Rajendran Home",detail:"Singanallur, Coimbatore · MR Plywood · PU Finish"},
-  {img:"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=90&auto=format&fit=crop",title:"Complete 3BHK - Suresh Kumar",detail:"Vadavalli, Coimbatore · BWP Plywood · PU + Mica · Hettich"},
-  {img:"https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&q=90&auto=format&fit=crop",title:"Villa Interiors - Lakshmi Venkat",detail:"Kovaipudur, Coimbatore · HDHMR · Full PU · Hettich"},
-  {img:"https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=1200&q=90&auto=format&fit=crop",title:"Grand Foyer - Chandrasekar Home",detail:"Tidel Park Area, Coimbatore · MR Plywood · Mica"},
-  {img:"https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=90&auto=format&fit=crop",title:"Home Office - Karthik Rajan",detail:"Hopes College, Coimbatore · BWP Plywood · Acrylic"},
-  {img:"https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1200&q=90&auto=format&fit=crop",title:"Pooja Unit - Venkataraman Home",detail:"Bharathi Park, Coimbatore · BWP Plywood · PU Finish"}
-];
+let LB_PROJECTS = [];
 let lbCurrent = 0;
+let portfolioCurrentFilter = 'all';
+
+async function loadPortfolioProjects() {
+  const grid = document.getElementById('portGrid');
+  const countEl = document.getElementById('portCount');
+  if (!grid) return;
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--warm-grey);font-size:13px;letter-spacing:.2em;text-transform:uppercase">Loading projects...</div>';
+  try {
+    const res = await fetch(API + '/portfolios');
+    const data = await res.json();
+    const projects = Array.isArray(data) ? data : (data.portfolios || []);
+    if (projects.length === 0) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--warm-grey);font-size:13px">No projects yet. Check back soon.</div>';
+      countEl.textContent = '0 projects';
+      return;
+    }
+    LB_PROJECTS = projects.map(p => ({
+      _id: p._id,
+      img: p.images && p.images[0] ? p.images[0] : 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=1200&q=90',
+      images: p.images || [],
+      title: p.name || p.title || 'Project',
+      detail: (p.location ? p.location + ' · ' : '') + (p.description || ''),
+      cat: p.category || 'other',
+      location: p.location || '',
+      description: p.description || ''
+    }));
+    renderPortfolioGrid(portfolioCurrentFilter);
+  } catch(e) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--warm-grey);font-size:13px">Could not load projects. Please try again.</div>';
+  }
+}
+
+function renderPortfolioGrid(cat) {
+  portfolioCurrentFilter = cat;
+  const grid = document.getElementById('portGrid');
+  const countEl = document.getElementById('portCount');
+  const filtered = cat === 'all' ? LB_PROJECTS : LB_PROJECTS.filter(p => p.cat === cat);
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--warm-grey);font-size:13px">No projects in this category yet.</div>';
+    countEl.textContent = '0 projects';
+    return;
+  }
+  const catLabels = {kitchen:'Kitchen',bedroom:'Bedroom',living:'Living Room',fullhome:'Full Home',other:'Other'};
+  grid.innerHTML = filtered.map((p, i) => `
+    <div class="port-project" data-cat="${p.cat}" onclick="openLB(${LB_PROJECTS.indexOf(p)})" style="animation-delay:${i*0.05}s">
+      <div class="pp-img">
+        <img src="${p.img}" alt="${p.title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=700&q=80'">
+        <div class="pp-cat">${catLabels[p.cat]||p.cat}</div>
+      </div>
+      <div class="pp-info">
+        <div class="pp-title">${p.title}</div>
+        <div class="pp-detail">${p.description||''}</div>
+        <div class="pp-footer">
+          <div class="pp-location">${p.location ? '📍 '+p.location : ''}</div>
+          <button class="pp-view">View →</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  countEl.textContent = filtered.length + ' project' + (filtered.length !== 1 ? 's' : '');
+}
 
 function openLB(idx) {
   lbCurrent = idx;
   const p = LB_PROJECTS[idx];
+  if (!p) return;
   document.getElementById('lbImg').src = p.img;
   document.getElementById('lbTitle').textContent = p.title;
   document.getElementById('lbDetail').textContent = p.detail;
@@ -3299,16 +3485,137 @@ document.addEventListener('keydown', e => {
 function filterPortfolio(cat, el) {
   document.querySelectorAll('.port-filter').forEach(f => f.classList.remove('on'));
   el.classList.add('on');
-  const projects = document.querySelectorAll('.port-project');
-  let visible = 0;
-  projects.forEach((p, i) => {
-    const show = cat === 'all' || p.dataset.cat === cat;
-    p.style.display = show ? 'block' : 'none';
-    if (show) { p.style.animationDelay = (visible * 0.05) + 's'; visible++; }
-  });
-  document.getElementById('portCount').textContent = visible + ' project' + (visible !== 1 ? 's' : '');
+  if (LB_PROJECTS.length > 0) {
+    renderPortfolioGrid(cat);
+  }
 }
 
+// Load portfolio when page is shown
+function loadPortfolioIfNeeded() {
+  if (typeof LB_PROJECTS === 'undefined' || LB_PROJECTS.length === 0) loadPortfolioProjects();
+}
+
+
+
+// ═══ ADMIN QUOTE MODE — only visible after admin login ═══
+let customLineItems = [];
+
+// Show/hide admin panel based on session
+function checkAdminQuotePanel(){
+  const panel = document.getElementById('adminQuotePanel');
+  const saveBtn = document.getElementById('saveQuoteBtn');
+  if(!panel) return;
+  if(isAdminSession()){
+    panel.style.display = 'block';
+    saveBtn.style.display = 'none';
+  } else {
+    panel.style.display = 'none';
+    saveBtn.style.display = 'block';
+  }
+}
+
+function addCustomLine(){
+  const name = document.getElementById('customItemName').value.trim();
+  const price = parseFloat(document.getElementById('customItemPrice').value);
+  if(!name || isNaN(price) || price <= 0){ alert('Enter item name and a valid price'); return; }
+  customLineItems.push({name, price});
+  document.getElementById('customItemName').value = '';
+  document.getElementById('customItemPrice').value = '';
+  renderCustomLines();
+  recalc();
+}
+
+function removeCustomLine(i){
+  customLineItems.splice(i, 1);
+  renderCustomLines();
+  recalc();
+}
+
+function renderCustomLines(){
+  const el = document.getElementById('customLinesList');
+  if(!el) return;
+  if(customLineItems.length === 0){ el.innerHTML = ''; return; }
+  el.innerHTML = customLineItems.map((item, i) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px">
+      <span style="color:var(--warm-white)">${item.name}</span>
+      <span style="display:flex;align-items:center;gap:8px">
+        <span style="color:var(--gold)">₹${item.price.toLocaleString('en-IN')}</span>
+        <button onclick="removeCustomLine(${i})" style="background:none;border:none;color:#E57373;cursor:pointer;font-size:14px;padding:0 2px">×</button>
+      </span>
+    </div>
+  `).join('');
+}
+
+async function saveAdminQuote(){
+  const custName = document.getElementById('adminCustName').value.trim();
+  if(!custName){ alert('Please enter customer name'); document.getElementById('adminCustName').focus(); return; }
+  const custPhone = document.getElementById('adminCustPhone').value.trim();
+  const custCity = document.getElementById('adminCustCity').value.trim();
+  const markupPct = parseFloat(document.getElementById('adminMarkup').value) || 0;
+  const markup = getMarkup();
+
+  let grand = 0, tsqft = 0;
+  const roomNames = [], matParts = [], fullRoomData = {};
+  const activeR = Array.from(document.querySelectorAll('.rtab[data-r]')).map(t => t.dataset.r);
+  activeR.forEach(r => {
+    if(!dims[r]) return;
+    const rd = getRoomDef(r);
+    let rt = 0; const units = [];
+    rd.u.forEach(u => {
+      const dv = dims[r][u.id];
+      if(dv && dv.on && dv.sqft > 0){
+        const basePrice = Math.round(dv.sqft * getRate(r, u.r));
+        const price = Math.round(basePrice * markup);
+        rt += price; tsqft += dv.sqft;
+        units.push({id: u.id, name: u.n, sqft: dv.sqft, rate: getRate(r, u.r), price});
+      }
+    });
+    if(rt > 0){
+      grand += rt;
+      roomNames.push(rd.i + ' ' + getBedLabel(r));
+      matParts.push(rMats[r]?.core || 'MR Plywood');
+      fullRoomData[r] = {label: getBedLabel(r), icon: rd.i, materials: {...rMats[r]}, total: rt, units};
+    }
+  });
+
+  const customTotal = customLineItems.reduce((s, i) => s + i.price, 0);
+  grand += customTotal;
+  if(!grand){ alert('Please add at least one unit first!'); return; }
+
+  const btn = document.getElementById('saveAdminQuoteBtn');
+  if(btn){ btn.textContent = 'Saving...'; btn.disabled = true; }
+
+  try {
+    const res = await fetch(API + '/quotes', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET},
+      body: JSON.stringify({
+        customerName: custName, customerPhone: custPhone, customerCity: custCity,
+        isAdminQuote: true, markupPct,
+        rooms: roomNames, materials: [...new Set(matParts)].join(' · '),
+        total: grand, sqft: tsqft.toFixed(1),
+        customItems: customLineItems, fullData: fullRoomData
+      })
+    });
+    if(btn){ btn.textContent = '💾 Save Admin Quote'; btn.disabled = false; }
+    if(res.ok){
+      alert('✅ Quote saved for ' + custName + '!');
+      // Reset fields
+      document.getElementById('adminCustName').value = '';
+      document.getElementById('adminCustPhone').value = '';
+      document.getElementById('adminCustCity').value = '';
+      document.getElementById('adminMarkup').value = '';
+      customLineItems = [];
+      renderCustomLines();
+      recalc();
+    } else {
+      alert('Could not save quote. Please try again.');
+    }
+  } catch(e){
+    if(btn){ btn.textContent = '💾 Save Admin Quote'; btn.disabled = false; }
+    alert('Network error. Please try again.');
+  }
+}
 </script>
 
 <!-- ══ PAGE: PORTFOLIO ══ -->
@@ -3347,206 +3654,9 @@ function filterPortfolio(cat, el) {
     <div class="port-count" id="portCount">12 projects</div>
   </div>
 
-  <!-- Grid -->
+  <!-- Grid (loaded dynamically from MongoDB) -->
   <div class="port-grid" id="portGrid">
-
-    <!-- Kitchen Projects -->
-    <div class="port-project" data-cat="kitchen" onclick="openLB(0)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=700&q=80&auto=format&fit=crop" alt="Kitchen">
-        <div class="pp-cat">Kitchen</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Sharma Residence Kitchen</div>
-        <div class="pp-detail">Full modular kitchen with island counter. BWP plywood, PU finish, Hettich hardware throughout.</div>
-        <div class="pp-tags"><span class="pp-tag">BWP Plywood</span><span class="pp-tag">PU Finish</span><span class="pp-tag">Hettich</span><span class="pp-tag">Island Counter</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 RS Puram, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="port-project" data-cat="kitchen" onclick="openLB(1)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=700&q=80&auto=format&fit=crop" alt="Kitchen 2">
-        <div class="pp-cat">Kitchen</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Nair Family Kitchen</div>
-        <div class="pp-detail">L-shaped kitchen with crockery unit and loft. Acrylic finish, soft-close Haffle hardware.</div>
-        <div class="pp-tags"><span class="pp-tag">BWP Plywood</span><span class="pp-tag">Acrylic</span><span class="pp-tag">Haffle</span><span class="pp-tag">L-Shape</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Peelamedu, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="port-project" data-cat="kitchen" onclick="openLB(2)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=700&q=80&auto=format&fit=crop" alt="Kitchen 3">
-        <div class="pp-cat">Kitchen</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Krishnamurthy Straight Kitchen</div>
-        <div class="pp-detail">Compact straight kitchen with tall unit and roll top shutter. MR ply with glossy mica.</div>
-        <div class="pp-tags"><span class="pp-tag">MR Plywood</span><span class="pp-tag">Glossy Mica</span><span class="pp-tag">Ebco</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Saibaba Colony, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bedroom Projects -->
-    <div class="port-project" data-cat="bedroom" onclick="openLB(3)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=700&q=80&auto=format&fit=crop" alt="Bedroom">
-        <div class="pp-cat">Bedroom</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Master Bedroom — Patel Villa</div>
-        <div class="pp-detail">Full wardrobe with dressing unit and wall panelling. BWP ply, PU finish, Hettich soft-close.</div>
-        <div class="pp-tags"><span class="pp-tag">BWP Plywood</span><span class="pp-tag">PU Finish</span><span class="pp-tag">Wall Panel</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Avinashi Road, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="port-project" data-cat="bedroom" onclick="openLB(4)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1540518614846-7eded433c457?w=700&q=80&auto=format&fit=crop" alt="Bedroom 2">
-        <div class="pp-cat">Bedroom</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Children Bedroom — Iyer Home</div>
-        <div class="pp-detail">Study table with overhead storage, bed with drawers and loft unit. MR ply, mica finish.</div>
-        <div class="pp-tags"><span class="pp-tag">MR Plywood</span><span class="pp-tag">Mica</span><span class="pp-tag">Study Table</span><span class="pp-tag">Loft</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Gandhipuram, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Living Room Projects -->
-    <div class="port-project" data-cat="living" onclick="openLB(5)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=700&q=80&auto=format&fit=crop" alt="Living">
-        <div class="pp-cat">Living Room</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Living Room — Mehta Residence</div>
-        <div class="pp-detail">TV unit with partition, full wall panelling with LED cove. HDHMR, acrylic finish, Haffle.</div>
-        <div class="pp-tags"><span class="pp-tag">HDHMR</span><span class="pp-tag">Acrylic</span><span class="pp-tag">Wall Panel</span><span class="pp-tag">LED Cove</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Race Course, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="port-project" data-cat="living" onclick="openLB(6)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=700&q=80&auto=format&fit=crop" alt="Living 2">
-        <div class="pp-cat">Living Room</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Feature Wall — Rajendran Home</div>
-        <div class="pp-detail">Fluted wall panel with TV unit and floating shelves. Premium MR ply with PU finish.</div>
-        <div class="pp-tags"><span class="pp-tag">MR Plywood</span><span class="pp-tag">PU Finish</span><span class="pp-tag">Fluted Panel</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Singanallur, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Full Home Projects -->
-    <div class="port-project" data-cat="fullhome" onclick="openLB(7)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=700&q=80&auto=format&fit=crop" alt="Full Home">
-        <div class="pp-cat">Full Home</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Complete 3BHK — Suresh Kumar</div>
-        <div class="pp-detail">Full home execution — kitchen, 3 bedrooms, living room and foyer. BWP throughout with Hettich.</div>
-        <div class="pp-tags"><span class="pp-tag">BWP Plywood</span><span class="pp-tag">PU + Mica</span><span class="pp-tag">Hettich</span><span class="pp-tag">3BHK</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Vadavalli, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="port-project" data-cat="fullhome" onclick="openLB(8)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?w=700&q=80&auto=format&fit=crop" alt="Full Home 2">
-        <div class="pp-cat">Full Home</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Villa Interiors — Lakshmi Venkat</div>
-        <div class="pp-detail">Full villa execution with premium materials throughout. Architect-designed, Elevate-executed.</div>
-        <div class="pp-tags"><span class="pp-tag">HDHMR</span><span class="pp-tag">Full PU</span><span class="pp-tag">Hettich</span><span class="pp-tag">Villa</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Kovaipudur, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Other Projects -->
-    <div class="port-project" data-cat="other" onclick="openLB(9)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=700&q=80&auto=format&fit=crop" alt="Foyer">
-        <div class="pp-cat">Foyer</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Grand Foyer — Chandrasekar Home</div>
-        <div class="pp-detail">Foyer with console unit, wall storage and shoe cabinet. Mica with brass accent handles.</div>
-        <div class="pp-tags"><span class="pp-tag">MR Plywood</span><span class="pp-tag">Mica</span><span class="pp-tag">Brass Handles</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Tidel Park Area, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="port-project" data-cat="other" onclick="openLB(10)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=700&q=80&auto=format&fit=crop" alt="Office">
-        <div class="pp-cat">Office</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Home Office — Karthik Rajan</div>
-        <div class="pp-detail">Complete home office with built-in shelving, TV unit and study table. Clean minimalist finish.</div>
-        <div class="pp-tags"><span class="pp-tag">BWP Plywood</span><span class="pp-tag">Acrylic</span><span class="pp-tag">Minimalist</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Hopes College, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="port-project" data-cat="other" onclick="openLB(11)">
-      <div class="pp-img">
-        <img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=700&q=80&auto=format&fit=crop" alt="Pooja">
-        <div class="pp-cat">Pooja Room</div>
-      </div>
-      <div class="pp-info">
-        <div class="pp-title">Pooja Unit — Venkataraman Home</div>
-        <div class="pp-detail">Premium pooja unit with LED backlit niches, storage drawers and traditional carved details.</div>
-        <div class="pp-tags"><span class="pp-tag">BWP Plywood</span><span class="pp-tag">PU Finish</span><span class="pp-tag">LED Lighting</span></div>
-        <div class="pp-footer">
-          <div class="pp-location">📍 Bharathi Park, Coimbatore</div>
-          <button class="pp-view">View →</button>
-        </div>
-      </div>
-    </div>
-
+    <div style="grid-column:1/-1;text-align:center;padding:80px 0;color:var(--warm-grey);font-size:13px;letter-spacing:.2em;text-transform:uppercase">Loading projects...</div>
   </div><!-- /port-grid -->
 
   <!-- CTA strip -->
@@ -3610,6 +3720,7 @@ function filterPortfolio(cat, el) {
       <div style="display:flex;gap:10px;align-items:center">
         <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--warm-grey)" id="admin-last-refresh">—</div>
         <button onclick="loadAdminData()" style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:rgba(201,169,110,.1);color:var(--gold);border:1px solid rgba(201,169,110,.2);padding:8px 16px;cursor:pointer;font-family:'DM Sans',sans-serif">↻ Refresh</button>
+        <button onclick="goPg('calc')" style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:var(--gold);color:var(--black);border:none;padding:8px 16px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:700">🧮 New Quote</button>
         <button onclick="adminLogout()" style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:transparent;color:var(--warm-grey);border:1px solid var(--border);padding:8px 16px;cursor:pointer;font-family:'DM Sans',sans-serif">Sign Out</button>
       </div>
     </div>
@@ -3629,6 +3740,7 @@ function filterPortfolio(cat, el) {
         <button class="admin-tab on" onclick="switchAdminTab('users',this)" id="tab-users">👥 Customers</button>
         <button class="admin-tab" onclick="switchAdminTab('quotes',this)" id="tab-quotes">💰 Quotes</button>
         <button class="admin-tab" onclick="switchAdminTab('bookings',this)" id="tab-bookings">📅 Bookings</button>
+        <button class="admin-tab" onclick="switchAdminTab('portfolio',this)" id="tab-portfolio">🖼 Portfolio</button>
       </div>
 
       <!-- Users Table -->
@@ -3688,11 +3800,46 @@ function filterPortfolio(cat, el) {
         </div>
       </div>
 
+      <!-- Portfolio Management -->
+      <div id="admin-section-portfolio" style="display:none">
+        <div class="admin-table-wrap" style="margin-bottom:20px">
+          <div class="admin-table-hdr">
+            <div class="admin-table-title">🖼 Add New Project</div>
+          </div>
+          <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="fg"><label>Project Name *</label><input type="text" id="pf-name" placeholder="e.g. Sharma Residence Kitchen"></div>
+            <div class="fg"><label>Category *</label>
+              <select id="pf-cat" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--warm-white);padding:12px 14px;font-size:13px;font-family:'DM Sans',sans-serif">
+                <option value="kitchen">Kitchen</option>
+                <option value="bedroom">Bedroom</option>
+                <option value="living">Living Room</option>
+                <option value="fullhome">Full Home</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="fg"><label>Location</label><input type="text" id="pf-loc" placeholder="e.g. RS Puram, Coimbatore"></div>
+            <div class="fg"><label>Description</label><input type="text" id="pf-desc" placeholder="e.g. BWP Plywood · PU Finish · Hettich hardware"></div>
+            <div class="fg" style="grid-column:1/-1"><label>Image URLs (one per line) *</label><textarea id="pf-imgs" rows="4" style="width:100%;background:var(--card2);border:1px solid var(--border);color:var(--warm-white);padding:12px 14px;font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical" placeholder="https://res.cloudinary.com/yourname/image/upload/photo1.jpg&#10;https://res.cloudinary.com/yourname/image/upload/photo2.jpg"></textarea></div>
+            <div style="grid-column:1/-1;display:flex;gap:10px;align-items:center">
+              <button onclick="adminAddPortfolio()" class="btn-g" style="padding:12px 28px;font-size:10px"><span>Add Project →</span></button>
+              <div id="pf-msg" style="font-size:12px;color:var(--gold)"></div>
+            </div>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-hdr">
+            <div class="admin-table-title">🖼 All Portfolio Projects</div>
+            <button onclick="loadAdminPortfolio()" style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;background:rgba(201,169,110,.1);color:var(--gold);border:1px solid rgba(201,169,110,.2);padding:6px 14px;cursor:pointer;font-family:'DM Sans',sans-serif">↻ Refresh</button>
+          </div>
+          <div id="adminPortfolioList" style="padding:20px">
+            <div style="text-align:center;color:var(--warm-grey);padding:40px">Loading...</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
-
-<!-- ADMIN QUOTE DETAIL MODAL -->
 <div id="adminQuoteModal" style="display:none;position:fixed;inset:0;background:rgba(5,5,5,.95);z-index:6000;overflow-y:auto;padding:20px">
   <div style="max-width:700px;margin:0 auto">
     <div id="adminQuoteContent"></div>
