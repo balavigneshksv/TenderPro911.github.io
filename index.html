@@ -2775,8 +2775,8 @@ async function loadAdminData(){
   } else {
     qb.innerHTML = quotes.map((q,i) => `<tr>
       <td style="color:var(--warm-grey)">${i+1}</td>
-      <td><strong>${q.user?.name||'—'}</strong></td>
-      <td><a href="tel:${q.user?.phone}" style="color:var(--gold)">${q.user?.phone||'—'}</a></td>
+      <td><strong>${q.customerName||q.user?.name||'—'}</strong></td>
+      <td><a href="tel:${q.customerPhone||q.user?.phone}" style="color:var(--gold)">${q.customerPhone||q.user?.phone||'—'}</a></td>
       <td style="font-size:11px">${(q.rooms||[]).join(', ')}</td>
       <td style="color:var(--warm-grey);font-size:11px">${q.materials||'—'}</td>
       <td>${q.sqft||'—'} sqft</td>
@@ -2784,8 +2784,9 @@ async function loadAdminData(){
       <td style="color:var(--warm-grey)">${new Date(q.createdAt).toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata'})}</td>
       <td style="display:flex;gap:6px;flex-wrap:wrap">
         <button onclick="adminViewQuote(${JSON.stringify(q).replace(/"/g,'&quot;')})" style="background:rgba(201,169,110,.1);border:1px solid rgba(201,169,110,.25);color:var(--gold);padding:5px 10px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">📄 View</button>
+        <button onclick="adminEditQuote('${q._id}')" style="background:rgba(201,169,110,.15);border:1px solid rgba(201,169,110,.3);color:var(--gold);padding:5px 10px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">✏️ Edit</button>
         <button onclick="adminDownloadPDF(${JSON.stringify(q).replace(/"/g,'&quot;')})" style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);color:#25d366;padding:5px 10px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap">⬇️ PDF</button>
-        <a href="https://wa.me/91${q.user?.phone}?text=Hi ${encodeURIComponent(q.user?.name||'')}, regarding your Elevate Interiors quote of Rs.${Number(q.total).toLocaleString('en-IN')} - we would like to discuss next steps!" target="_blank" style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);color:#25d366;padding:5px 10px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-block;white-space:nowrap">💬 WA</a>
+        <a href="https://wa.me/91${q.customerPhone||q.user?.phone}?text=Hi ${encodeURIComponent(q.customerName||q.user?.name||'')}, regarding your Elevate Interiors quote of Rs.${Number(q.total).toLocaleString('en-IN')} - we would like to discuss next steps!" target="_blank" style="background:rgba(37,211,102,.08);border:1px solid rgba(37,211,102,.2);color:#25d366;padding:5px 10px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-block;white-space:nowrap">💬 WA</a>
       </td>
     </tr>`).join('');
   }
@@ -2897,6 +2898,18 @@ function adminViewQuote(q){
 }
 
 // ══ ADMIN PDF DOWNLOAD ══
+// Edit existing quote — load into calculator with admin mode prefilled
+async function adminEditQuote(quoteId){
+  try {
+    const res = await fetch(`${API}/quotes/${quoteId}`, {headers:{'x-admin-secret': ADMIN_SECRET}});
+    const q = await res.json();
+    if(!q || !q._id){ alert('Could not load quote.'); return; }
+    // Store quote data for calculator to pick up
+    sessionStorage.setItem('editingQuote', JSON.stringify(q));
+    goPg('calc');
+  } catch(e){ alert('Error loading quote: '+e.message); }
+}
+
 const RATE_REMAP={2050:1950,2225:2200,1950:1900,3000:2900,975:900,900:850};
 function remapRate(r){return RATE_REMAP[r]||r;}
 function adminDownloadPDF(q){
@@ -2919,7 +2932,6 @@ function adminDownloadPDF(q){
               <tr>
                 <th style="text-align:left;padding:7px 12px;color:#444;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:600">Unit Description</th>
                 <th style="text-align:right;padding:7px 12px;color:#444;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:600">Area (Sq.Ft)</th>
-                <th style="text-align:right;padding:7px 12px;color:#444;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:600">Rate/Sq.Ft</th>
                 <th style="text-align:right;padding:7px 12px;color:#444;font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:600">Amount (Rs.)</th>
               </tr>
             </thead>
@@ -2928,7 +2940,6 @@ function adminDownloadPDF(q){
                 <tr style="background:${i%2===0?'#fff':'#fafafa'};border-bottom:1px solid #f0f0f0">
                   <td style="padding:7px 12px;color:#333;font-size:12px">${u.name}</td>
                   <td style="text-align:right;padding:7px 12px;color:#555;font-size:12px">${u.sqft}</td>
-                  <td style="text-align:right;padding:7px 12px;color:#555;font-size:12px">Rs.${remapRate(u.rate)}</td>
                   <td style="text-align:right;padding:7px 12px;color:#1a1a1a;font-weight:600;font-size:12px">Rs.${Math.round((u.sqft||0)*remapRate(u.rate)).toLocaleString('en-IN')}</td>
                 </tr>`).join('')}
             </tbody>
@@ -2996,20 +3007,37 @@ function adminDownloadPDF(q){
 
   <div class="section-title">Customer Details</div>
   <div class="customer-box">
-    <div class="customer-field"><label>Name</label><span>Mr. ${q.user?.name||'—'}</span></div>
-    <div class="customer-field"><label>Phone</label><span>${q.user?.phone||'—'}</span></div>
-    <div class="customer-field"><label>City</label><span>${q.user?.city||'—'}</span></div>
+    <div class="customer-field"><label>Name</label><span>${q.customerName||('Mr. '+(q.user?.name||'—'))}</span></div>
+    <div class="customer-field"><label>Phone</label><span>${q.customerPhone||q.user?.phone||'—'}</span></div>
+    <div class="customer-field"><label>City</label><span>${q.customerCity||q.user?.city||'—'}</span></div>
   </div>
 
   <div class="rooms-title">Room-wise Breakdown</div>
   ${roomText}
 
+  ${(q.customItems&&q.customItems.length)?`
+  <div style="margin-bottom:20px">
+    <div style="display:flex;justify-content:space-between;padding:8px 12px;background:#f0f0f0;border-left:3px solid #C9A96E">
+      <strong style="color:#1a1a1a;font-size:13px;font-weight:600">Additional Items</strong>
+      <strong style="color:#C9A96E;font-size:13px">Rs.${(q.customItems||[]).reduce((s,ci)=>s+(Number(ci.price)||0),0).toLocaleString('en-IN')}</strong>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <tbody>
+        ${(q.customItems||[]).map((ci,i)=>`
+          <tr style="background:${i%2===0?'#fff':'#fafafa'};border-bottom:1px solid #f0f0f0">
+            <td style="padding:7px 12px;color:#333;font-size:12px">${ci.name}</td>
+            <td style="text-align:right;padding:7px 12px;color:#1a1a1a;font-weight:600;font-size:12px">Rs.${Number(ci.price).toLocaleString('en-IN')}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`:''}
+
   <div class="total-box">
     <div class="total-label">Estimated Total</div>
-    <div class="total-amount">₹${(()=>{if(!q.fullData)return Number(q.total).toLocaleString('en-IN');let t=0;Object.values(q.fullData).forEach(rd=>{(rd.units||[]).forEach(u=>{t+=Math.round((u.sqft||0)*remapRate(u.rate||0));});});return t.toLocaleString('en-IN');})()}</div>
+    <div class="total-amount">₹${(()=>{let t=0;if(q.fullData){Object.values(q.fullData).forEach(rd=>{(rd.units||[]).forEach(u=>{t+=Math.round((u.sqft||0)*remapRate(u.rate||0));});});}else{t=Number(q.total)||0;}(q.customItems||[]).forEach(ci=>{t+=Number(ci.price)||0;});return t.toLocaleString('en-IN');})()}</div>
   </div>
 
-  <div class="disclaimer">* This is an estimated quote based on approximate measurements. Final pricing will be confirmed after a site visit and detailed measurement by our team. Transportation, Design and Taxes are extra.</div>
+  <div class="disclaimer">* Approx. Final quote after site visit. Installation &amp; taxes extra. GST extra.</div>
   <div class="disclaimer" style="margin-top:8px">* Kitchen accessories are not included in this quote.</div>
 
   <div class="footer">
@@ -3508,9 +3536,28 @@ function checkAdminQuotePanel(){
   if(isAdminSession()){
     panel.style.display = 'block';
     saveBtn.style.display = 'none';
+    // Prefill if editing an existing quote
+    const editRaw = sessionStorage.getItem('editingQuote');
+    if(editRaw){
+      try {
+        const eq = JSON.parse(editRaw);
+        sessionStorage.removeItem('editingQuote');
+        document.getElementById('adminCustName').value = eq.customerName||eq.user?.name||'';
+        document.getElementById('adminCustPhone').value = eq.customerPhone||eq.user?.phone||'';
+        document.getElementById('adminCustCity').value = eq.customerCity||eq.user?.city||'';
+        document.getElementById('adminMarkupPct').value = eq.markupPct||0;
+        // Prefill custom items
+        customLineItems = (eq.customItems||[]).map(ci=>({name:ci.name,price:Number(ci.price)}));
+        renderCustomLines();
+        recalc();
+        // Store quote ID for updating instead of creating new
+        panel.dataset.editId = eq._id||'';
+      } catch(e){}
+    }
   } else {
     panel.style.display = 'none';
     saveBtn.style.display = 'block';
+    panel.dataset.editId = '';
   }
 }
 
@@ -3585,9 +3632,14 @@ async function saveAdminQuote(){
   const btn = document.getElementById('saveAdminQuoteBtn');
   if(btn){ btn.textContent = 'Saving...'; btn.disabled = true; }
 
+  const panel = document.getElementById('adminQuotePanel');
+  const editId = panel?.dataset?.editId || '';
+
   try {
-    const res = await fetch(API + '/quotes', {
-      method: 'POST',
+    const method = editId ? 'PUT' : 'POST';
+    const url = editId ? `${API}/quotes/${editId}` : `${API}/quotes`;
+    const res = await fetch(url, {
+      method,
       headers: {'Content-Type': 'application/json', 'x-admin-secret': ADMIN_SECRET},
       body: JSON.stringify({
         customerName: custName, customerPhone: custPhone, customerCity: custCity,
@@ -3599,7 +3651,8 @@ async function saveAdminQuote(){
     });
     if(btn){ btn.textContent = '💾 Save Admin Quote'; btn.disabled = false; }
     if(res.ok){
-      alert('✅ Quote saved for ' + custName + '!');
+      alert(editId ? '✅ Quote updated for ' + custName + '!' : '✅ Quote saved for ' + custName + '!');
+      if(panel) panel.dataset.editId = '';
       // Reset fields
       document.getElementById('adminCustName').value = '';
       document.getElementById('adminCustPhone').value = '';
