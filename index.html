@@ -3742,24 +3742,55 @@ function renderPortfolioGrid(cat) {
   countEl.textContent = filtered.length + ' project' + (filtered.length !== 1 ? 's' : '');
 }
 
+let lbImgCurrent = 0; // current image index within a project
+
 function openLB(idx) {
   lbCurrent = idx;
-  const p = LB_PROJECTS[idx];
-  if (!p) return;
-  document.getElementById('lbImg').src = p.img;
-  document.getElementById('lbTitle').textContent = p.title;
-  document.getElementById('lbDetail').textContent = p.detail;
+  lbImgCurrent = 0;
+  showLBImage();
   document.getElementById('lightbox').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
+function showLBImage() {
+  const p = LB_PROJECTS[lbCurrent];
+  if (!p) return;
+  const imgs = p.images && p.images.length ? p.images : [p.img];
+  const total = imgs.length;
+  // clamp
+  lbImgCurrent = ((lbImgCurrent % total) + total) % total;
+  document.getElementById('lbImg').src = imgs[lbImgCurrent];
+  document.getElementById('lbTitle').textContent = p.title;
+  document.getElementById('lbDetail').textContent = p.detail;
+  // Show counter if multiple images
+  const counter = document.getElementById('lbCounter');
+  if (counter) {
+    counter.textContent = total > 1 ? (lbImgCurrent + 1) + ' / ' + total : '';
+  }
+}
+
 function closeLB() {
   document.getElementById('lightbox').classList.remove('open');
   document.body.style.overflow = '';
 }
+
 function navLB(dir) {
-  lbCurrent = (lbCurrent + dir + LB_PROJECTS.length) % LB_PROJECTS.length;
-  openLB(lbCurrent);
+  const p = LB_PROJECTS[lbCurrent];
+  if (!p) return;
+  const imgs = p.images && p.images.length ? p.images : [p.img];
+  const total = imgs.length;
+  if (total > 1) {
+    // Navigate within the project's images first
+    lbImgCurrent = ((lbImgCurrent + dir) % total + total) % total;
+    showLBImage();
+  } else {
+    // Only 1 image — move to next/prev project
+    lbCurrent = ((lbCurrent + dir) % LB_PROJECTS.length + LB_PROJECTS.length) % LB_PROJECTS.length;
+    lbImgCurrent = 0;
+    showLBImage();
+  }
 }
+
 document.addEventListener('keydown', e => {
   if (!document.getElementById('lightbox').classList.contains('open')) return;
   if (e.key === 'ArrowLeft') navLB(-1);
@@ -4080,6 +4111,7 @@ async function saveAdminQuote(){
     <button class="lb-nav lb-next" onclick="navLB(1)">›</button>
   </div>
   <div class="lb-info">
+    <div id="lbCounter" style="font-size:11px;letter-spacing:.2em;color:var(--warm-grey);margin-bottom:6px;text-align:center"></div>
     <div class="lb-title" id="lbTitle"></div>
     <div class="lb-detail" id="lbDetail"></div>
   </div>
