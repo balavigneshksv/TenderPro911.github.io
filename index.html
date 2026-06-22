@@ -1578,7 +1578,7 @@ tr:hover td{background:rgba(201,169,110,.03)}
       </div>
       <div class="qp-footer">
         <div class="qgrand-row"><div><div class="qgrand-lbl">Estimated Total</div><div class="qsqft" id="qSqft">0 sq ft</div></div><div class="qgrand-val" id="qGrand">₹0</div></div>
-        <div class="qnote">* Approx. Final quote after site visit. Installation & taxes extra. GST extra.</div>
+        <div class="qnote">* Transportation & Taxes are extra which will be added in the final bill.</div>
         <!-- Admin Quote Mode Panel — hidden from customers, shown only to admin -->
         <div id="adminQuotePanel" style="display:none">
           <div style="background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.2);padding:12px 14px;margin-bottom:8px">
@@ -3167,8 +3167,8 @@ async function adminEditQuote(quoteId){
   } catch(e){ alert('Error loading quote: '+e.message); }
 }
 
-const RATE_REMAP={2050:1950,2225:2200,1950:1900,3000:2900,975:900,900:850};
-function remapRate(r){return RATE_REMAP[r]||r;}
+// RATE_REMAP removed — PDF now uses stored rates directly (no remapping)
+function remapRate(r){return r;}
 function adminDownloadPDF(q){
   const date = new Date(q.createdAt).toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric',timeZone:'Asia/Kolkata'});
   const quoteId = 'EI-' + (q._id||'').slice(-6).toUpperCase();
@@ -3181,7 +3181,7 @@ function adminDownloadPDF(q){
         <div style="margin-bottom:20px">
           <div style="display:flex;justify-content:space-between;padding:8px 12px;background:#f0f0f0;border-left:3px solid #C9A96E">
             <strong style="color:#1a1a1a;font-size:13px;font-weight:600">${rd.label||r}</strong>
-            <strong style="color:#C9A96E;font-size:13px">Rs.${(rd.units||[]).reduce((s,u)=>s+Math.round((u.sqft||0)*remapRate(u.rate||0)),0).toLocaleString('en-IN')}</strong>
+            <strong style="color:#C9A96E;font-size:13px">Rs.${(rd.units||[]).reduce((s,u)=>s+(u.price||Math.round((u.sqft||0)*(u.rate||0))),0).toLocaleString('en-IN')}</strong>
           </div>
           <div style="font-size:11px;color:#666;padding:5px 12px;background:#f7f7f7;border-left:3px solid #e0e0e0">Core: ${rd.materials?.core||''} &nbsp;|&nbsp; Finish: ${rd.materials?.finish||''} &nbsp;|&nbsp; Hardware: ${rd.materials?.hw||''}</div>
           <table style="width:100%;border-collapse:collapse;font-size:12px">
@@ -3197,7 +3197,7 @@ function adminDownloadPDF(q){
                 <tr style="background:${i%2===0?'#fff':'#fafafa'};border-bottom:1px solid #f0f0f0">
                   <td style="padding:7px 12px;color:#333;font-size:12px">${u.name}</td>
                   <td style="text-align:right;padding:7px 12px;color:#555;font-size:12px">${u.sqft}</td>
-                  <td style="text-align:right;padding:7px 12px;color:#1a1a1a;font-weight:600;font-size:12px">Rs.${Math.round((u.sqft||0)*remapRate(u.rate)).toLocaleString('en-IN')}</td>
+                  <td style="text-align:right;padding:7px 12px;color:#1a1a1a;font-weight:600;font-size:12px">Rs.${(u.price||Math.round((u.sqft||0)*(u.rate||0))).toLocaleString('en-IN')}</td>
                 </tr>`).join('')}
             </tbody>
           </table>
@@ -3289,12 +3289,13 @@ function adminDownloadPDF(q){
     </table>
   </div>`:''}
 
+  ${q.markupPct>0?`<div style="display:flex;justify-content:space-between;padding:8px 16px;background:#f8f4ed;border:1px solid #e8d9b0;margin-bottom:4px;font-size:11px"><span style="color:#888;letter-spacing:1px;text-transform:uppercase">Includes ${q.markupPct}% Admin Markup</span><span style="color:#C9A96E;font-weight:600">Applied</span></div>`:''}
   <div class="total-box">
     <div class="total-label">Estimated Total</div>
-    <div class="total-amount">₹${(()=>{let t=0;if(q.fullData){Object.values(q.fullData).forEach(rd=>{(rd.units||[]).forEach(u=>{t+=Math.round((u.sqft||0)*remapRate(u.rate||0));});});}else{t=Number(q.total)||0;}(q.customItems||[]).forEach(ci=>{t+=Number(ci.price)||0;});return t.toLocaleString('en-IN');})()}</div>
+    <div class="total-amount">₹${(()=>{let t=0;if(q.fullData){Object.values(q.fullData).forEach(rd=>{(rd.units||[]).forEach(u=>{t+=u.price||Math.round((u.sqft||0)*(u.rate||0));});});}else{t=Number(q.total)||0;}(q.customItems||[]).forEach(ci=>{t+=Number(ci.price)||0;});return t.toLocaleString('en-IN');})()}</div>
   </div>
 
-  <div class="disclaimer">* Approx. Final quote after site visit. Installation &amp; taxes extra. GST extra.</div>
+  <div class="disclaimer">* Transportation &amp; Taxes are extra which will be added in the final bill.</div>
   <div class="disclaimer" style="margin-top:8px">* Kitchen accessories are not included in this quote.</div>
 
   <div class="footer">
@@ -3945,7 +3946,7 @@ async function saveAdminQuote(){
         const basePrice = Math.round(dv.sqft * getRate(r, u.r));
         const price = Math.round(basePrice * markup);
         rt += price; tsqft += dv.sqft;
-        units.push({id: u.id, name: u.n, sqft: dv.sqft, rate: getRate(r, u.r), price});
+        units.push({id: u.id, name: u.n, sqft: dv.sqft, rate: Math.round(getRate(r, u.r) * markup), price});
       }
     });
     if(rt > 0){
